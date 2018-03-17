@@ -7,6 +7,11 @@ module SubstitutionCipher
     # Returns: String
     def self.encrypt(document, key)
       # TODO: encrypt string using caesar cipher
+      if key > 0
+        document.to_s.chars.map { |d| (d.ord + key).chr }.join
+      else
+        caesar_error
+      end
     end
 
     # Decrypts String document using integer key
@@ -16,6 +21,15 @@ module SubstitutionCipher
     # Returns: String
     def self.decrypt(document, key)
       # TODO: decrypt string using caesar cipher
+      if key > 0
+        document.to_s.chars.map { |d| (d.ord - key).chr }.join
+      else
+        caesar_error
+      end
+    end
+
+    def caesar_error
+      'Key must be positive integer'
     end
   end
 
