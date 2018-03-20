@@ -39,7 +39,16 @@ module SubstitutionCipher
     #   document: String
     #   key: Fixnum (integer)
     # Returns: String
+    def to_chr(ary)
+      ary.map{|n|n.chr}
+    end
     def self.encrypt(document, key)
+      #create ascii array
+      @ascii_table=to_chr((0..127).to_a)
+      #create hash table with key
+      @p_hash=Hash[ascii_table.zip ascii_table.shuffle(random: Random.new(key)) ]
+      #map to encypted text
+      encrypted_doc=document.to_s.chars.map{|n|p_hash[n]}.join
       # TODO: encrypt string using a permutation cipher
     end
 
@@ -50,6 +59,7 @@ module SubstitutionCipher
     # Returns: String
     def self.decrypt(document, key)
       # TODO: decrypt string using a permutation cipher
+      decrypted_doc=document.to_s.chars.map{|n|@p_hash.key(n)}.join
     end
   end
 end
