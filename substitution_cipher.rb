@@ -1,4 +1,6 @@
+# This module contains Caesar and Permutation encryption
 module SubstitutionCipher
+  # This module contains Caesar encryption
   module Caesar
     # Encrypts document using key
     # Arguments:
@@ -33,23 +35,23 @@ module SubstitutionCipher
     end
   end
 
+  # This module contains Permutation encryption
   module Permutation
     # Encrypts document using key
     # Arguments:
     #   document: String
     #   key: Fixnum (integer)
     # Returns: String
-    def to_chr(ary)
-      ary.map{|n|n.chr}
+
+    def self.enigma(key)
+      ascii_table = (0..127).to_a.map(&:chr)
+      Hash[ascii_table.zip ascii_table.shuffle(random: Random.new(key))]
     end
+
     def self.encrypt(document, key)
-      #create ascii array
-      @ascii_table=to_chr((0..127).to_a)
-      #create hash table with key
-      @p_hash=Hash[ascii_table.zip ascii_table.shuffle(random: Random.new(key)) ]
-      #map to encypted text
-      encrypted_doc=document.to_s.chars.map{|n|p_hash[n]}.join
       # TODO: encrypt string using a permutation cipher
+      p_hash = enigma(key)
+      key > 0 ? document.to_s.chars.map { |n| p_hash[n] }.join : caesar_error
     end
 
     # Decrypts String document using integer key
@@ -59,7 +61,8 @@ module SubstitutionCipher
     # Returns: String
     def self.decrypt(document, key)
       # TODO: decrypt string using a permutation cipher
-      decrypted_doc=document.to_s.chars.map{|n|@p_hash.key(n)}.join
+      p_hash = enigma(key)
+      key > 0 ? document.to_s.chars.map { |n| p_hash.key(n) }.join : caesar_error
     end
   end
 end
