@@ -51,7 +51,11 @@ module SubstitutionCipher
     def self.encrypt(document, key)
       # TODO: encrypt string using a permutation cipher
       p_hash = enigma(key)
-      key > 0 ? document.to_s.chars.map { |n| p_hash[n] }.join : caesar_error
+      if key > 0
+        document.to_s.chars.map { |n| p_hash[n] }.join
+      else
+        permutation_error
+      end
     end
 
     # Decrypts String document using integer key
@@ -62,7 +66,16 @@ module SubstitutionCipher
     def self.decrypt(document, key)
       # TODO: decrypt string using a permutation cipher
       p_hash = enigma(key)
-      key > 0 ? document.to_s.chars.map { |n| p_hash.key(n) }.join : caesar_error
+      if key > 0 
+        document.to_s.chars.map { |n| p_hash.key(n) }.join
+      else
+        permutation_error
+      end
     end
+
+    def permutation_error
+      'Key must be positive integer'
+    end
+    
   end
 end
