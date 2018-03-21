@@ -39,7 +39,7 @@ module DoubleTranspositionCipher
     end
     result.transpose.join('')
   end
-
+  # decrypt
   def self.decrypt(ciphertext, key)
     r_len = row_len(ciphertext)
     c_len = col_len(ciphertext)
