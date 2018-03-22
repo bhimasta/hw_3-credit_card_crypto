@@ -1,61 +1,54 @@
 # DoubleTranspositionCipher
 module DoubleTranspositionCipher
-  # "{\"number\":\"4916603231464963\",\"expiration_date\":\"Mar-30-2020\",\"owner\":\"Soumya Ray\",\"credit_network\":\"Visa\"}"
+  def self.encrypt(document, key)
+    clen = col_len(document.to_s)
+    rlen = row_len(document.to_s, clen)
+    rand_gen = Random.new(key)
+    r_order = shuffled(rlen, rand_gen)
+    c_order = shuffled(clen, rand_gen)
+    doc = slicing(document.to_s, rlen, clen)
+    transposing(r_order, c_order, doc).transpose.join('')
+  end
+
+  def self.decrypt(ciphertext, key)
+    clen = col_len(ciphertext)
+    rlen = row_len(ciphertext, clen)
+    rand_gen = Random.new(key)
+    r_order = shuffled(rlen, rand_gen)
+    c_order = shuffled(clen, rand_gen)
+    cip = ciphertext.chars.each_slice(clen).to_a
+    detransposing(r_order, c_order, cip)
+  end
+
+  def self.shuffled(len, rand)
+    (0..(len - 1)).to_a.shuffle(random: rand)
+  end
 
   def self.col_len(doc)
-    doc_len = doc.length
-    (doc_len**(1.0 / 2)).round
+    (doc.length**0.5).round
   end
 
-  def self.row_len(doc)
-    doc_len = doc.length
-    cols = col_len(doc)
-    doc_len > cols**2 ? cols + 1 : cols
+  def self.row_len(doc, clen)
+    doc.length > clen**2 ? clen + 1 : clen
   end
 
-  def self.stuff(doc, document, r_len, c_len)
-    a_size = r_len * c_len
-    (a_size - document.length).times do
-      doc.last.push('#')
-    end
+  def self.slicing(document, rlen, clen)
+    doc = document.chars.each_slice(clen).to_a
+    a_size = rlen * clen
+    (a_size - document.length).times { doc.last.push('#') }
+    doc
   end
 
-  def self.encrypt(document, key)
-    document = document.to_s
-    r_len = row_len(document)
-    c_len = col_len(document)
-    rand_gen = Random.new(key)
-    r_order = (0..(r_len - 1)).to_a.shuffle(random: rand_gen)
-    c_order = (0..(c_len - 1)).to_a.shuffle(random: rand_gen)
-    doc = document.chars.each_slice(c_len).to_a
-    stuff(doc, document, r_len, c_len)
-    trans_doc = Array.new(r_len)
-    r_order.each_with_index do |r, i|
-      trans_doc[i] = doc[r]
-    end
-    result = Array.new(c_len, [])
-    c_order.each_with_index do |c, i|
-      result[i] = trans_doc.transpose[c]
-    end
-    result.transpose.join('')
+  def self.transposing(r_order, c_order, doc)
+    r_order.each_with_index.map { |r, i| r_order[i] = doc[r] }
+    c_order.each_with_index { |c, i| c_order[i] = r_order.transpose[c] }
   end
-  # decrypt
-  def self.decrypt(ciphertext, key)
-    r_len = row_len(ciphertext)
-    c_len = col_len(ciphertext)
-    rand_gen = Random.new(key)
-    r_order = (0..(r_len - 1)).to_a.shuffle(random: rand_gen)
-    c_order = (0..(c_len - 1)).to_a.shuffle(random: rand_gen)
-    cip = ciphertext.chars.each_slice(c_len).to_a
-    trans = Array.new(c_len)
-    c_order.each_with_index do |c, i|
-      trans[c] = cip.transpose[i]
-    end
-    result = Array.new(r_len)
-    puts "r_order: #{r_order}"
-    r_order.each_with_index do |r, i|
-      result[r] = trans.transpose[i]
-    end
+
+  def self.detransposing(r_order, c_order, cip)
+    trans = []
+    c_order.each_with_index { |c, i| trans[c] = cip.transpose[i] }
+    result = []
+    r_order.each_with_index { |r, i| result[r] = trans.transpose[i] }
     result.join('').delete! '#'
   end
 end
