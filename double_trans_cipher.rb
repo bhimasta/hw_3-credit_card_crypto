@@ -11,7 +11,7 @@ module DoubleTranspositionCipher
   end
 
   def self.decrypt(ciphertext, key)
-    clen = col_len(ciphertext)
+    clen = col_len(ciphertext.to_s)
     rlen = row_len(ciphertext, clen)
     rand_gen = Random.new(key)
     r_order = shuffled(rlen, rand_gen)
