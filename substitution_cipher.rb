@@ -76,6 +76,5 @@ module SubstitutionCipher
     def permutation_error
       'Key must be positive integer'
     end
-    
   end
 end

@@ -14,18 +14,28 @@ describe 'Test card info encryption' do
     @key = 3
   end
 
-  ciphers.each do |chiper_name, cipher_module|
-    describe "Using #{chiper_name} Cipher" do
+  ciphers.each do |cipher_name, cipher_module|
+    describe "Using #{cipher_name} Cipher " do
       it 'should encrypt card information' do
         enc = cipher_module.encrypt(@cc, @key)
         enc.wont_equal @cc.to_s
         enc.wont_be_nil
       end
 
-      it 'should decrypt text' do
-        enc = cipher_module.encrypt(@cc, @key)
-        dec = cipher_module.decrypt(enc, @key)
-        dec.must_equal @cc.to_s
+      ciphers.each do |cipher_name2, cipher_module2|
+        if cipher_name == cipher_name2
+          it 'should decrypt text' do
+            enc = cipher_module.encrypt(@cc, @key)
+            dec = cipher_module2.decrypt(enc, @key)
+            dec.must_equal @cc.to_s
+          end
+        else
+          it "Using #{cipher_name2} should not have same encrypt" do
+            enc = cipher_module.encrypt(@cc, @key)
+            enc2 = cipher_module2.encrypt(@cc, @key)
+            enc.wont_equal enc2
+          end
+        end
       end
     end
   end
