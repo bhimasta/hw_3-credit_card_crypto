@@ -1,41 +1,42 @@
 require_relative '../credit_card'
 require_relative '../substitution_cipher'
+require_relative '../double_trans_cipher'
 require 'minitest/autorun'
+
+ciphers = [['Caesar', SubstitutionCipher::Caesar],
+           ['Permutation', SubstitutionCipher::Permutation],
+           ['Double Transposition', DoubleTranspositionCipher]]
 
 describe 'Test card info encryption' do
   before do
-    @cc = CreditCard.new('4916603231464963', 'Mar-30-2020', 'Soumya Ray', 'Visa')
+    @cc = CreditCard.new('4916603231464963',
+                         'Mar-30-2020', 'Soumya Ray', 'Visa')
     @key = 3
   end
 
-  describe 'Using Caesar cipher' do
-    it 'should encrypt card information' do
-      enc = SubstitutionCipher::Caesar.encrypt(@cc, @key)
-      enc.wont_equal @cc.to_s
-      enc.wont_be_nil
-    end
+  ciphers.each do |cipher_name, cipher_module|
+    describe "Using #{cipher_name} Cipher " do
+      it 'should encrypt card information' do
+        enc = cipher_module.encrypt(@cc, @key)
+        enc.wont_equal @cc.to_s
+        enc.wont_be_nil
+      end
 
-    it 'should decrypt text' do
-      enc = SubstitutionCipher::Caesar.encrypt(@cc, @key)
-      dec = SubstitutionCipher::Caesar.decrypt(enc, @key)
-      dec.must_equal @cc.to_s
-    end
-  end
-
-  describe 'Using Permutation cipher' do
-    it 'should encrypt card information' do
-      enc = SubstitutionCipher::Permutation.encrypt(@cc, @key)
-      enc.wont_equal @cc.to_s
-      enc.wont_be_nil
-    end
-
-    it 'should decrypt text' do
-      enc = SubstitutionCipher::Permutation.encrypt(@cc, @key)
-      dec = SubstitutionCipher::Permutation.decrypt(enc, @key)
-      dec.must_equal @cc.to_s
+      ciphers.each do |cipher_name2, cipher_module2|
+        if cipher_name == cipher_name2
+          it 'should decrypt text' do
+            enc = cipher_module.encrypt(@cc, @key)
+            dec = cipher_module2.decrypt(enc, @key)
+            dec.must_equal @cc.to_s
+          end
+        else
+          it "Using #{cipher_name2} should not have same encrypt" do
+            enc = cipher_module.encrypt(@cc, @key)
+            enc2 = cipher_module2.encrypt(@cc, @key)
+            enc.wont_equal enc2
+          end
+        end
+      end
     end
   end
-
-  # TODO: Add tests for double transposition and modern symmetric key ciphers
-  #       Can you DRY out the tests using metaprogramming? (see lecture slide)
 end
